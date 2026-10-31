@@ -28,3 +28,16 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Diagnose DNS and live URLs
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          for host in ammarbd.cyou www.ammarbd.cyou ammar-khandoker-bd.github.io; do
+            echo "===== DNS LOOKUP: $host ====="
+            getent ahostsv4 "$host" || true
+          done
+          for url in https://ammarbd.cyou https://www.ammarbd.cyou https://ammar-khandoker-bd.github.io/Portfolio/; do
+            echo "===== HTTP CHECK: $url ====="
+            curl -sSIL --max-time 20 "$url" 2>&1 | head -n 12
+          done
